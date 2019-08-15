@@ -17,10 +17,27 @@ def parse_dates():
 	else:
 		# parse input dates range
 		dates = []
-		for user_date in sys.argv[1:]:
-			date = datetime.datetime.strptime(user_date, "%Y/%m/%d:%H")
-			dates.append((date.strftime("%Y"), date.strftime("%m"), 
-						  date.strftime("%d"), date.strftime("%H")))
+		try:
+			# Check if user inputted the date in the correct format
+			date1 = datetime.datetime.strptime(sys.argv[1], "%Y/%m/%d:%H")
+			if len(sys.argv) == 2:
+				return [(date1.strftime("%Y"), date1.strftime("%m"), 
+				 		 date1.strftime("%d"), date1.strftime("%H"))]
+			date2 = datetime.datetime.strptime(sys.argv[2], "%Y/%m/%d:%H")
+		except Exception as e:
+			print("Date is either incorrect or in an invalid format.")
+			print("Please validate the date and type it as: 2018/08/22:05")
+			sys.exit()
+
+		if date1 > date2:
+			print("Please have the 2nd date being later than the 1st date.")
+			sys.exit()
+		while date1 <= date2:
+			# Create a date for each hour in the range
+			dates.append((date1.strftime("%Y"), date1.strftime("%m"), 
+						  date1.strftime("%d"), date1.strftime("%H")))
+			date1 += datetime.timedelta(hours=1)
+
 		return dates
 
 def insert_sorted(lis, tup):
@@ -140,7 +157,7 @@ def calculate_top_25():
 		# Write count to file in json format
 		with open(file_path, "w") as write_file:
 			json.dump(domains, write_file)
-		print("The wikipedia count is here: " + file_path)
+		print("Success! The wikipedia top count is here: " + file_path)
 
 
 if __name__ == '__main__':
