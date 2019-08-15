@@ -8,8 +8,8 @@ from io import BytesIO
 
 BLACKLIST = "https://s3.amazonaws.com/dd-interview-data/data_engineer/wikipedia/blacklist_domains_and_pages"
 
-def parse_dates():
-	if len(sys.argv) == 1:
+def parse_dates(args):
+	if len(args) == 0:
 		# wiki dump is in utc. We subtract 2 hours because that's the latest one they have available
 		date = datetime.datetime.utcnow() - datetime.timedelta(hours=2)
 		return [(date.strftime("%Y"), date.strftime("%m"), 
@@ -19,11 +19,11 @@ def parse_dates():
 		dates = []
 		try:
 			# Check if user inputted the date in the correct format
-			date1 = datetime.datetime.strptime(sys.argv[1], "%Y/%m/%d:%H")
-			if len(sys.argv) == 2:
+			date1 = datetime.datetime.strptime(args[0], "%Y/%m/%d:%H")
+			if len(args) == 1:
 				return [(date1.strftime("%Y"), date1.strftime("%m"), 
 				 		 date1.strftime("%d"), date1.strftime("%H"))]
-			date2 = datetime.datetime.strptime(sys.argv[2], "%Y/%m/%d:%H")
+			date2 = datetime.datetime.strptime(args[1], "%Y/%m/%d:%H")
 		except Exception as e:
 			print("Date is either incorrect or in an invalid format.")
 			print("Please validate the date and type it as: 2018/08/22:05")
@@ -91,10 +91,10 @@ def validate_page(domain, page, blacklist):
 
 	return True
 
-def calculate_top_25():
+def calculate_top_25(args):
 	blacklist = make_blacklist()
 
-	for date in parse_dates():
+	for date in parse_dates(args):
 		# runs the code and write a file for each day
 		year, month, day, hour = date
 
@@ -161,4 +161,5 @@ def calculate_top_25():
 
 
 if __name__ == '__main__':
-	calculate_top_25()
+	calculate_top_25(sys.argv[1:])
+
